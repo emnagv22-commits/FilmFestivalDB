@@ -1,3 +1,4 @@
+import os
 import hmac
 from functools import wraps
 
@@ -12,24 +13,43 @@ from flask import (
 )
 
 import mysql.connector
+from dotenv import load_dotenv
 
+
+load_dotenv()
 
 app = Flask(__name__)
 
-app.secret_key = "film-festival-secret-key-2026"
-
-
-MYSQL_PASSWORD = "Dark3233"
-ADMIN_PASSWORD = "12345"
+app.secret_key = os.getenv(
+    "SECRET_KEY",
+    "local-development-secret-key"
+)
 
 
 def get_connection():
     return mysql.connector.connect(
-        host="localhost",
-        port=3306,
-        user="root",
-        password=MYSQL_PASSWORD,
-        database="film_festivals"
+        host=os.getenv(
+            "MYSQLHOST",
+            os.getenv("DB_HOST", "localhost")
+        ),
+        port=int(
+            os.getenv(
+                "MYSQLPORT",
+                os.getenv("DB_PORT", "3306")
+            )
+        ),
+        user=os.getenv(
+            "MYSQLUSER",
+            os.getenv("DB_USER", "root")
+        ),
+        password=os.getenv(
+            "MYSQLPASSWORD",
+            os.getenv("DB_PASSWORD", "")
+        ),
+        database=os.getenv(
+            "MYSQLDATABASE",
+            os.getenv("DB_NAME", "film_festivals")
+        )
     )
 
 
@@ -41,6 +61,7 @@ def admin_required(function):
                 "Для этого действия необходимо войти как администратор.",
                 "error"
             )
+
             return redirect(url_for("login"))
 
         return function(*args, **kwargs)
@@ -91,6 +112,7 @@ def home():
             f.production_year,
             f.age_rating,
             f.notes,
+
             GROUP_CONCAT(
                 DISTINCT CONCAT(
                     fe.name,
@@ -101,6 +123,7 @@ def home():
                 ORDER BY fe.year DESC, fe.name
                 SEPARATOR ', '
             ) AS festivals
+
         FROM films f
 
         LEFT JOIN directors d
@@ -142,11 +165,22 @@ def login():
         return redirect(url_for("home"))
 
     if request.method == "POST":
-        entered_password = request.form.get("password", "")
+        entered_password = request.form.get(
+            "password",
+            ""
+        )
 
-        if hmac.compare_digest(
-            entered_password,
-            ADMIN_PASSWORD
+        admin_password = os.getenv(
+            "ADMIN_PASSWORD",
+            ""
+        )
+
+        if (
+            admin_password
+            and hmac.compare_digest(
+                entered_password,
+                admin_password
+            )
         ):
             session["admin"] = True
 
@@ -177,7 +211,10 @@ def logout():
     return redirect(url_for("home"))
 
 
-@app.route("/add-film", methods=["GET", "POST"])
+@app.route(
+    "/add-film",
+    methods=["GET", "POST"]
+)
 @admin_required
 def add_film():
     if request.method == "POST":
@@ -253,6 +290,7 @@ def add_film():
                     director_id,
                     age_rating
                 )
+
                 VALUES (
                     %s,
                     %s,
@@ -287,6 +325,7 @@ def add_film():
                         festival_id,
                         film_id
                     )
+
                     VALUES (%s, %s)
                     """,
                     (
@@ -320,8 +359,12 @@ def add_film():
             id,
             name,
             year
+
         FROM festivals
-        ORDER BY year DESC, name
+
+        ORDER BY
+            year DESC,
+            name
     """)
 
     festivals = cursor.fetchall()
@@ -404,6 +447,7 @@ def edit_film(film_id):
             cursor.execute(
                 """
                 UPDATE films
+
                 SET
                     title_original = %s,
                     title_russian = %s,
@@ -414,6 +458,7 @@ def edit_film(film_id):
                     notes = %s,
                     director_id = %s,
                     age_rating = %s
+
                 WHERE id = %s
                 """,
                 (
@@ -445,6 +490,7 @@ def edit_film(film_id):
                         festival_id,
                         film_id
                     )
+
                     VALUES (%s, %s)
                     """,
                     (
@@ -483,6 +529,7 @@ def edit_film(film_id):
             f.notes,
             f.age_rating,
             d.full_name AS director
+
         FROM films f
 
         LEFT JOIN directors d
@@ -506,8 +553,12 @@ def edit_film(film_id):
             id,
             name,
             year
+
         FROM festivals
-        ORDER BY year DESC, name
+
+        ORDER BY
+            year DESC,
+            name
     """)
 
     festivals = cursor.fetchall()
@@ -612,9 +663,12 @@ def add_festival():
         cursor.execute(
             """
             SELECT id
+
             FROM festivals
+
             WHERE LOWER(name) = LOWER(%s)
             AND year = %s
+
             LIMIT 1
             """,
             (
@@ -645,6 +699,7 @@ def add_festival():
                 year,
                 city
             )
+
             VALUES (%s, %s, %s)
             """,
             (
@@ -672,4 +727,4 @@ def add_festival():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)
