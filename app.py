@@ -61,7 +61,6 @@ def admin_required(function):
                 "Для этого действия необходимо войти как администратор.",
                 "error"
             )
-
             return redirect(url_for("login"))
 
         return function(*args, **kwargs)
@@ -85,6 +84,9 @@ def get_or_create_director(cursor, director_name):
     director = cursor.fetchone()
 
     if director:
+        if isinstance(director, dict):
+            return director["id"]
+
         return director[0]
 
     cursor.execute(
@@ -290,7 +292,6 @@ def add_film():
                     director_id,
                     age_rating
                 )
-
                 VALUES (
                     %s,
                     %s,
@@ -325,7 +326,6 @@ def add_film():
                         festival_id,
                         film_id
                     )
-
                     VALUES (%s, %s)
                     """,
                     (
@@ -359,9 +359,7 @@ def add_film():
             id,
             name,
             year
-
         FROM festivals
-
         ORDER BY
             year DESC,
             name
@@ -447,7 +445,6 @@ def edit_film(film_id):
             cursor.execute(
                 """
                 UPDATE films
-
                 SET
                     title_original = %s,
                     title_russian = %s,
@@ -458,7 +455,6 @@ def edit_film(film_id):
                     notes = %s,
                     director_id = %s,
                     age_rating = %s
-
                 WHERE id = %s
                 """,
                 (
@@ -490,7 +486,6 @@ def edit_film(film_id):
                         festival_id,
                         film_id
                     )
-
                     VALUES (%s, %s)
                     """,
                     (
@@ -553,9 +548,7 @@ def edit_film(film_id):
             id,
             name,
             year
-
         FROM festivals
-
         ORDER BY
             year DESC,
             name
@@ -663,12 +656,9 @@ def add_festival():
         cursor.execute(
             """
             SELECT id
-
             FROM festivals
-
             WHERE LOWER(name) = LOWER(%s)
             AND year = %s
-
             LIMIT 1
             """,
             (
@@ -699,7 +689,6 @@ def add_festival():
                 year,
                 city
             )
-
             VALUES (%s, %s, %s)
             """,
             (
@@ -727,4 +716,8 @@ def add_festival():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(
+        host="0.0.0.0",
+        port=int(os.getenv("PORT", "5000")),
+        debug=True
+    )
