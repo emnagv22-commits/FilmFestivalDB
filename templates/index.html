@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <title>База кинофестивалей</title>
+    <link rel="stylesheet" href="/static/style.css">
+
+    <script>
+        function filterTable() {
+            const input = document.getElementById("searchInput");
+            const filter = input.value.toLowerCase();
+            const table = document.getElementById("filmsTable");
+            const rows = table.getElementsByTagName("tr");
+
+            for (let i = 1; i < rows.length; i++) {
+                const cells = rows[i].getElementsByTagName("td");
+                let match = false;
+
+                for (let j = 0; j < cells.length; j++) {
+                    const text = cells[j].textContent.toLowerCase();
+
+                    if (text.includes(filter)) {
+                        match = true;
+                        break;
+                    }
+                }
+
+                rows[i].style.display = match ? "" : "none";
+            }
+        }
+    </script>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="top-bar">
+
+        <h1>База кинофестивалей</h1>
+
+        <div>
+            {% if is_admin %}
+
+                <span class="admin-status">
+                    Режим администратора
+                </span>
+
+                <a class="secondary-button" href="/logout">
+                    Выйти
+                </a>
+
+            {% else %}
+
+                <a class="secondary-button" href="/login">
+                    Войти как администратор
+                </a>
+
+            {% endif %}
+        </div>
+
+    </div>
+
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+
+        {% if messages %}
+
+            {% for category, message in messages %}
+
+                <div class="message {{ category }}">
+                    {{ message }}
+                </div>
+
+            {% endfor %}
+
+        {% endif %}
+
+    {% endwith %}
+
+
+    {% if is_admin %}
+
+        <div class="actions">
+
+            <a class="button" href="/add-film">
+                + Добавить фильм
+            </a>
+
+            <a class="button" href="/add-festival">
+                + Добавить фестиваль
+            </a>
+
+        </div>
+
+    {% endif %}
+
+
+    <div class="search-box">
+
+        <input
+            type="text"
+            id="searchInput"
+            onkeyup="filterTable()"
+            placeholder="Поиск по фильму, режиссёру, фестивалю..."
+        >
+
+    </div>
+
+
+    <table id="filmsTable">
+
+        <thead>
+            <tr>
+                <th>Оригинальное название</th>
+                <th>Русское название</th>
+                <th>Режиссёр</th>
+                <th>Фестивали</th>
+                <th>Год выпуска</th>
+                <th>Возраст</th>
+                <th>Комментарии</th>
+
+                {% if is_admin %}
+                    <th>Действия</th>
+                {% endif %}
+            </tr>
+        </thead>
+
+
+        <tbody>
+
+            {% for film in films %}
+
+                <tr>
+
+                    <td>{{ film.title_original }}</td>
+
+                    <td>{{ film.title_russian or "" }}</td>
+
+                    <td>{{ film.director or "" }}</td>
+
+                    <td>{{ film.festivals or "" }}</td>
+
+                    <td>{{ film.production_year or "" }}</td>
+
+                    <td>{{ film.age_rating or "" }}</td>
+
+                    <td>{{ film.notes or "" }}</td>
+
+
+                    {% if is_admin %}
+
+                        <td class="action-cell">
+
+                            <a
+                                class="edit-button"
+                                href="/edit-film/{{ film.id }}"
+                            >
+                                Изменить
+                            </a>
+
+                            <form
+                                class="inline-form"
+                                method="POST"
+                                action="/delete-film/{{ film.id }}"
+                                onsubmit="return confirm('Удалить этот фильм?');"
+                            >
+
+                                <button
+                                    class="delete-button"
+                                    type="submit"
+                                >
+                                    Удалить
+                                </button>
+
+                            </form>
+
+                        </td>
+
+                    {% endif %}
+
+                </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+</body>
+
+</html>

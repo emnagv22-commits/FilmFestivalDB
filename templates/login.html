@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+
+    <title>Вход администратора</title>
+
+    <link
+        rel="stylesheet"
+        href="/static/style.css"
+    >
+</head>
+
+
+<body>
+
+<div class="container">
+
+    <h1>Вход администратора</h1>
+
+
+    {% with messages =
+        get_flashed_messages(with_categories=true)
+    %}
+
+        {% if messages %}
+
+            {% for category, message in messages %}
+
+                <div class="message {{ category }}">
+                    {{ message }}
+                </div>
+
+            {% endfor %}
+
+        {% endif %}
+
+    {% endwith %}
+
+
+    <form method="POST">
+
+        <p>
+
+            <label>
+                Пароль
+            </label>
+
+            <input
+                type="password"
+                name="password"
+                required
+                autofocus
+            >
+
+        </p>
+
+
+        <button
+            class="button"
+            type="submit"
+        >
+            Войти
+        </button>
+
+    </form>
+
+
+    <a
+        class="back-link"
+        href="/"
+    >
+        ← Назад
+    </a>
+
+</div>
+
+</body>
+
+</html>

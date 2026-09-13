@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Добавить фильм</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Добавить фильм</h1>
+
+    <form method="POST" action="/add-film">
+
+        <p>
+            <label>Оригинальное название</label>
+            <input type="text" name="title_original" required>
+        </p>
+
+        <p>
+            <label>Русское название</label>
+            <input type="text" name="title_russian">
+        </p>
+
+        <p>
+            <label>Режиссёр</label>
+            <input type="text" name="director" required>
+        </p>
+
+        <p>
+            <label>Год выпуска</label>
+            <input type="number" name="production_year">
+        </p>
+
+        <p>
+            <label>Хронометраж, минут</label>
+            <input type="number" name="duration_minutes">
+        </p>
+
+        <p>
+            <label>Страна</label>
+            <input type="text" name="country">
+        </p>
+
+        <p>
+            <label>Возрастное ограничение</label>
+            <input type="text" name="age_rating">
+        </p>
+
+        <p>
+            <label>Комментарии</label>
+            <textarea name="notes"></textarea>
+        </p>
+
+        <p>
+            <label>Фестиваль</label>
+            <select name="festival" required>
+                <option value="">-- Выберите фестиваль --</option>
+
+                {% for festival in festivals %}
+                    <option value="{{ festival.name }}">
+                        {{ festival.name }} ({{ festival.year }})
+                    </option>
+                {% endfor %}
+            </select>
+        </p>
+
+        <button class="button" type="submit">Сохранить фильм</button>
+
+    </form>
+
+    <a class="back-link" href="/">← Назад к фильмам</a>
+
+</div>
+
+</body>
+</html>

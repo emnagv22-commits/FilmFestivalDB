@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+
+    <title>Редактировать фильм</title>
+
+    <link
+        rel="stylesheet"
+        href="/static/style.css"
+    >
+</head>
+
+
+<body>
+
+<div class="container">
+
+    <h1>Редактировать фильм</h1>
+
+
+    <form method="POST">
+
+        <p>
+            <label>Оригинальное название</label>
+
+            <input
+                type="text"
+                name="title_original"
+                value="{{ film.title_original or '' }}"
+                required
+            >
+        </p>
+
+
+        <p>
+            <label>Русское название</label>
+
+            <input
+                type="text"
+                name="title_russian"
+                value="{{ film.title_russian or '' }}"
+            >
+        </p>
+
+
+        <p>
+            <label>Режиссёр</label>
+
+            <input
+                type="text"
+                name="director"
+                value="{{ film.director or '' }}"
+                required
+            >
+        </p>
+
+
+        <p>
+            <label>Год выпуска</label>
+
+            <input
+                type="number"
+                name="production_year"
+                value="{{ film.production_year or '' }}"
+            >
+        </p>
+
+
+        <p>
+            <label>Хронометраж, минут</label>
+
+            <input
+                type="number"
+                name="duration_minutes"
+                value="{{ film.duration_minutes or '' }}"
+            >
+        </p>
+
+
+        <p>
+            <label>Страна</label>
+
+            <input
+                type="text"
+                name="country"
+                value="{{ film.country or '' }}"
+            >
+        </p>
+
+
+        <p>
+            <label>Возрастное ограничение</label>
+
+            <input
+                type="text"
+                name="age_rating"
+                value="{{ film.age_rating or '' }}"
+            >
+        </p>
+
+
+        <p>
+            <label>Описание</label>
+
+            <textarea
+                name="synopsis"
+            >{{ film.synopsis or '' }}</textarea>
+        </p>
+
+
+        <p>
+            <label>Комментарии</label>
+
+            <textarea
+                name="notes"
+            >{{ film.notes or '' }}</textarea>
+        </p>
+
+
+        <p>
+
+            <label>
+                Фестивали
+            </label>
+
+            <select
+                name="festival_ids"
+                multiple
+                size="7"
+            >
+
+                {% for festival in festivals %}
+
+                    <option
+                        value="{{ festival.id }}"
+
+                        {% if festival.id
+                            in selected_festival_ids %}
+
+                            selected
+
+                        {% endif %}
+                    >
+                        {{ festival.name }}
+                        ({{ festival.year }})
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+            <small>
+                Для выбора нескольких фестивалей
+                удерживай Ctrl.
+            </small>
+
+        </p>
+
+
+        <button
+            class="button"
+            type="submit"
+        >
+            Сохранить изменения
+        </button>
+
+    </form>
+
+
+    <a
+        class="back-link"
+        href="/"
+    >
+        ← Отмена
+    </a>
+
+</div>
+
+</body>
+
+</html>

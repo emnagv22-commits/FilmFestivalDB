@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Добавить фестиваль</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Добавить фестиваль</h1>
+
+    <form method="POST" action="/add-festival">
+
+        <p>
+            <label>Название фестиваля</label>
+            <input type="text" name="name" required>
+        </p>
+
+        <p>
+            <label>Год</label>
+            <input type="number" name="year" required>
+        </p>
+
+        <p>
+            <label>Город</label>
+            <input type="text" name="city">
+        </p>
+
+        <button class="button" type="submit">Сохранить фестиваль</button>
+
+    </form>
+
+    <a class="back-link" href="/">← Назад</a>
+
+</div>
+
+</body>
+</html>
